@@ -1,49 +1,86 @@
-import { Fragment, useState } from 'react'
+import { Fragment, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import playerImage from '../Images/player.png'
+import ScoreBar from './ScoreBar';
+import Selector from './Selector';
+import SelectionDrawInterface from './SelectionDrawInterface';
+
+import piedraImg from '../Images/Pool/Piedra.png'
+import papelImg from '../Images/Pool/Papel.png'
+import tijeraImg from '../Images/Pool/Tijera.png'
+import lagartoImg from '../Images/Pool/Lagarto.png'
+import spockImg from '../Images/Pool/Spock.png'
+
 
 const VersusIA = () => {
-    const playerName = useLocation().state
-    const [points, setPoints] = useState(0)
-    const [machineSelection, setMachineSelection] = useState()
+    const location = useLocation()
+    const [player1, setPlayer1] = useState({name: location.state.player1, points: 0, selection: {}, pickState: {}})
+    const [player2, setPlayer2] = useState({name: 'I.A.', points: 0, selection: {}, pickState: {}})
 
-    const piedra = {name: 'Piedra', winsAgainst: ['Tijera', 'Lagarto']}
-    const papel = {name: 'Papel', winsAgainst: ['Piedra', 'Spock']}
-    const tijera = {name: 'Tijera', winsAgainst: ['Papel', 'Lagarto']}
-    const lagarto = {name: 'Lagarto', winsAgainst: ['Spock', 'Papel']}
-    const spock = {name: 'Spock', winsAgainst: ['Tijera', 'Piedra']}
+    const picks = {
+                    piedra: {name: 'Piedra', img: piedraImg, winsAgainst: ['Tijera', 'Lagarto']},
+                    papel: {name: 'Papel', img: papelImg, winsAgainst: ['Piedra', 'Spock']},
+                    tijera: {name: 'Tijera', img: tijeraImg, winsAgainst: ['Papel', 'Lagarto']},
+                    lagarto: {name: 'Lagarto', img: lagartoImg, winsAgainst: ['Spock', 'Papel']},
+                    spock: {name: 'Spock', img: spockImg, winsAgainst: ['Tijera', 'Piedra']}
+                  }
 
-    function machineTurn(playerSelection) {
-        const list = [piedra, papel, tijera, lagarto, spock]
+    function changeTurnHandler(playerSelection) {
+        setPlayer1(
+            player1 => ({
+                ...player1,
+                selection: playerSelection
+            })
+        )
         const index = Math.floor(Math.random() * 5)
-        setMachineSelection(list[index])
+        setPlayer2(
+            player2 => ({
+                ...player2,
+                selection: Object.values(picks)[index]
+            })
+        )
 
-        playerWins(playerSelection) ? setPoints(points + 1) : console.log('Ganó la IA!')
+        if(player1.selection.name === player2.selection.name) {
+            console.log('EMPATARON!')
+        } else if(playerWins(player1.selection)) {
+             setPlayer1(
+                player1 => ({
+                    ...player1,
+                    points: player1.points + 1
+                })
+             )
+        } else if(!playerWins(player1.selection)) {
+            setPlayer2(
+                player2 => ({
+                    ...player2,
+                    points: player2.points + 1
+                })
+             )
+        }
     }
 
-    function playerWins(playerSelection) {
-        let result = playerSelection.winsAgainst.map(winable => winable === machineSelection.name)
+    function playerWins() {
+        let result = player1.selection.winsAgainst.map(winable => winable === player2.selection.name)
         return result.includes(true)
     }
 
     return(
         <Fragment>
-            <div className='container text-center w-25 mx-auto border bg-light p-3'>
-                <div className='row m-0 justify-content-center'>
-                    <img src={playerImage} className='col-2'/>
-                    <h4 className='col-6 text-start my-auto'>{playerName}</h4>
-                    <h4 className='col-1 border border-2 rounded my-auto p-0'>{points}</h4>
+            <div className="row d-flex justify-content-center">
+                <div className="col">
+                    <ScoreBar playerName={player1.name} score={player1.points}/>
+                </div>
+                <div className="col">
+                    <ScoreBar playerName={player2.name} score={player2.points}/>
                 </div>
             </div>
-            <div className='container text-center w-25 mx-auto border bg-light p-3'>
-                <button onClick={() => machineTurn(piedra)}>{piedra.name}</button>
-                <button onClick={() => machineTurn(papel)}>{papel.name}</button>
-                <button onClick={() => machineTurn(tijera)}>{tijera.name}</button>
-                <button onClick={() => machineTurn(lagarto)}>{lagarto.name}</button>
-                <button onClick={() => machineTurn(spock)}>{spock.name}</button>
-            </div>
-            <div className='container text-center w-25 mx-auto border bg-light p-3'>
-                {machineSelection ? machineSelection.name : 'Esperando al jugador...'}
+            <div className="row mt-5 border">
+                <div className="col-2 text-center my-auto"><Selector changeTurnHandler={changeTurnHandler} picks={picks} playerSide={true}/></div>
+                <div className="vr p-0"/>
+                <div className="col"><SelectionDrawInterface player={player1.points} selection={player1.selection}/></div>
+                <div className="vr p-0"/>
+                <div className="col"><SelectionDrawInterface player={player2.points} selection={player2.selection}/></div>
+                <div className="vr p-0"/>
+                <div className="col-2 text-center my-auto"><Selector changeTurnHandler={changeTurnHandler} picks={picks} playerSide={false}/></div>
             </div>
         </Fragment>
     )

@@ -16,6 +16,7 @@ function App() {
     setTwoPlayerMode('invisible')
     setPlayerButton('')
     setIAButton('active')
+    setPlayer2Name('')
   }
 
   function changeVsPlayer() {
@@ -26,7 +27,7 @@ function App() {
 
   function navigateToPlayZone() {
     if(IAButton === 'active' && player1Name) {
-      navigate('/versus_ia', {state: player1Name})
+      navigate('/versus_ia', {state: {player1: player1Name}})
     }
   }
 
@@ -38,7 +39,7 @@ function App() {
             <h3>Seleccione un modo de juego!</h3>
           </div>
         </div>
-        <div class="btn-group w-25 mx-auto mb-4">
+        <div className="btn-group w-25 mx-auto mb-4">
           <button className={`btn btn-outline-primary ${IAButton} w-25`} onClick={changeToVsIA}>Vs. IA</button>
           <button className={`btn btn-outline-primary ${playerButton} w-25`} onClick={changeVsPlayer}>Vs. Player</button>
         </div>
