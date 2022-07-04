@@ -1,11 +1,11 @@
 import incognito from '../Images/incognito.jpg'
 
-const SelectionDrawInterface = ({player, selection}) => {
+const SelectionDrawInterface = ({player}) => {
     return(
         <div className="text-center">
-            <h4>{player}</h4>
-            <div>{selection? selection.name : 'Esperando elección...'}</div>
-            <img src={selection ? selection.img : incognito} alt="selección" className={`w-75 mt-2 mb-3 p-3 border rounded`}/>
+            <h4>{player.name}</h4>
+            <div>{player.selection.name ? player.selection.name : 'Esperando elección...'}</div>
+            <img src={player.selection.name ? player.selection.img : incognito} alt="selección" className={`w-75 mt-2 mb-3 p-3 border rounded`}/>
         </div>
     )
 }

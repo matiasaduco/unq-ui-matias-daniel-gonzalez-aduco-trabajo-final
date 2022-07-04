@@ -9,12 +9,14 @@ import papelImg from '../Images/Pool/Papel.png'
 import tijeraImg from '../Images/Pool/Tijera.png'
 import lagartoImg from '../Images/Pool/Lagarto.png'
 import spockImg from '../Images/Pool/Spock.png'
+import { useStateWithCallbackLazy } from 'use-state-with-callback';
 
 
 const VersusIA = () => {
     const location = useLocation()
-    const [player1, setPlayer1] = useState({name: location.state.player1, points: 0, selection: {}, pickState: {}})
-    const [player2, setPlayer2] = useState({name: 'I.A.', points: 0, selection: {}, pickState: {}})
+    const [player1, setPlayer1] = useStateWithCallbackLazy({name: location.state.player1, points: 0, selection: {}})
+    const [player2, setPlayer2] = useStateWithCallbackLazy({name: 'I.A.', points: 0, selection: {}})
+    const [player1Turn, setPlayer1Turn] = useState(true)
 
     const picks = {
                     piedra: {name: 'Piedra', img: piedraImg, winsAgainst: ['Tijera', 'Lagarto']},
@@ -24,13 +26,31 @@ const VersusIA = () => {
                     spock: {name: 'Spock', img: spockImg, winsAgainst: ['Tijera', 'Piedra']}
                   }
 
-    function changeTurnHandler(playerSelection) {
+    function player1Pick(playerSelection) {
+        console.log(playerSelection)
         setPlayer1(
             player1 => ({
                 ...player1,
                 selection: playerSelection
+            }), () => {console.log(player1.selection)}
+        )
+        
+        machineTurn()
+        setPlayer1Turn(false)
+    }
+
+    function player2Pick(playerSelection) {
+        setPlayer2(
+            player2 => ({
+                ...player2,
+                selection: playerSelection
             })
         )
+        calculateWinner()
+        setPlayer1Turn(true)
+    }
+
+    function machineTurn() {
         const index = Math.floor(Math.random() * 5)
         setPlayer2(
             player2 => ({
@@ -38,7 +58,11 @@ const VersusIA = () => {
                 selection: Object.values(picks)[index]
             })
         )
+        calculateWinner()
+        setPlayer1Turn(true)
+    }
 
+    function calculateWinner() {
         if(player1.selection.name === player2.selection.name) {
             console.log('EMPATARON!')
         } else if(playerWins(player1.selection)) {
@@ -48,7 +72,7 @@ const VersusIA = () => {
                     points: player1.points + 1
                 })
              )
-        } else if(!playerWins(player1.selection)) {
+        } else {
             setPlayer2(
                 player2 => ({
                     ...player2,
@@ -74,13 +98,13 @@ const VersusIA = () => {
                 </div>
             </div>
             <div className="row mt-5 border">
-                <div className="col-2 text-center my-auto"><Selector changeTurnHandler={changeTurnHandler} picks={picks} playerSide={true}/></div>
+                <div className="col-2 text-center my-auto"><Selector changeTurnHandler={player1Pick} picks={picks} playerTurn={player1Turn}/></div>
                 <div className="vr p-0"/>
-                <div className="col"><SelectionDrawInterface player={player1.points} selection={player1.selection}/></div>
+                <div className="col"><SelectionDrawInterface player={player1}/></div>
                 <div className="vr p-0"/>
-                <div className="col"><SelectionDrawInterface player={player2.points} selection={player2.selection}/></div>
+                <div className="col"><SelectionDrawInterface player={player2}/></div>
                 <div className="vr p-0"/>
-                <div className="col-2 text-center my-auto"><Selector changeTurnHandler={changeTurnHandler} picks={picks} playerSide={false}/></div>
+                <div className="col-2 text-center my-auto"><Selector changeTurnHandler={player2Pick} picks={picks} playerTurn={!player1Turn}/></div>
             </div>
         </Fragment>
     )
