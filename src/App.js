@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './App.css';
 import player from './Images/player.png'
@@ -7,10 +7,12 @@ function App() {
   const [IAButton, setIAButton] = useState('active')
   const [playerButton, setPlayerButton] = useState('')
   const [twoPlayerMode, setTwoPlayerMode] = useState('invisible')
+  const [roundsQuantity, setRoundsQuantity] = useState(0)
+
   const [player1Name, setPlayer1Name] = useState('')
   const [player2Name, setPlayer2Name] = useState('')
-  const navigate = useNavigate()
 
+  const navigate = useNavigate()
 
   function changeToVsIA() {
     setTwoPlayerMode('invisible')
@@ -26,11 +28,12 @@ function App() {
   }
 
   function navigateToPlayZone() {
-    if(IAButton === 'active' && player1Name) {
-      navigate('/versus_ia', {state: {player1: player1Name, mode: 'IA'}})
-      return
-    } else if (playerButton === 'active' && player1Name && player2Name) {
-      navigate('/versus_ia', {state: {player1: player1Name, player2: player2Name, mode: 'PVP'}})
+    if(IAButton === 'active' && player1Name && roundsQuantity !== 0) {
+      const IAName = Object.values(['Sheldon', 'Leonard', 'Howie', 'Raj'])[Math.floor(Math.random() * 5)]
+      navigate('/versus_ia', {state: {player1: player1Name, player2: '[I.A.] ' + IAName, mode: 'IA', rounds: roundsQuantity}})
+    }
+    else if (playerButton === 'active' && player1Name && player2Name && roundsQuantity !== 0) {
+      navigate('/versus_ia', {state: {player1: player1Name, player2: player2Name, mode: 'PVP', rounds: roundsQuantity}})
     }
   }
 
@@ -41,9 +44,23 @@ function App() {
           <h3>Seleccione un modo de juego!</h3>
         </div>
       </div>
-      <div className="btn-group w-25 mx-auto mb-4">
+      <div className="btn-group w-25 mx-auto mb-3">
         <button className={`btn btn-outline-primary ${IAButton} w-25`} onClick={changeToVsIA}>Vs. IA</button>
         <button className={`btn btn-outline-primary ${playerButton} w-25`} onClick={changeVsPlayer}>Vs. Player</button>
+      </div>
+      <div className='mb-3'>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" onChange={() => setRoundsQuantity(1)}/>
+          <label class="form-check-label" for="inlineRadio1">1 ronda</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" onChange={() => setRoundsQuantity(3)}/>
+          <label class="form-check-label" for="inlineRadio2">3 rondas</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3" onChange={() => setRoundsQuantity(5)}/>
+          <label class="form-check-label" for="inlineRadio3">5 rondas</label>
+        </div>
       </div>
       <div className='row mt-1 mb-3 w-75 mx-auto'>
         <span className='col-1 input-group-text rounded-0 ms-auto'>

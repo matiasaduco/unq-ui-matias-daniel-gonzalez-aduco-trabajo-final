@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import ScoreBar from './ScoreBar';
 import Selector from './Selector';
@@ -15,8 +15,9 @@ import { useStateWithCallbackLazy } from 'use-state-with-callback';
 const VersusIA = () => {
     const location = useLocation()
     const [player1, setPlayer1] = useStateWithCallbackLazy({name: location.state.player1, points: 0, selection: {}})
-    const [player2, setPlayer2] = useStateWithCallbackLazy({name: 'I.A.', points: 0, selection: {}})
+    const [player2, setPlayer2] = useStateWithCallbackLazy({name: location.state.player2, points: 0, selection: {}})
     const [player1Turn, setPlayer1Turn] = useState(true)
+    const rounds = location.state.rounds
 
     const picks = {
                     piedra: {name: 'Piedra', img: piedraImg, winsAgainst: ['Tijera', 'Lagarto']},
@@ -27,44 +28,34 @@ const VersusIA = () => {
                   }
 
     function player1Pick(playerSelection) {
-        console.log(playerSelection)
         setPlayer1(
             player1 => ({
                 ...player1,
                 selection: playerSelection
-            }), () => {console.log(player1.selection)}
+            })
         )
-        
-        machineTurn()
         setPlayer1Turn(false)
     }
 
-    function player2Pick(playerSelection) {
-        setPlayer2(
-            player2 => ({
-                ...player2,
-                selection: playerSelection
-            })
-        )
-        calculateWinner()
-        setPlayer1Turn(true)
-    }
-
-    function machineTurn() {
-        const index = Math.floor(Math.random() * 5)
-        setPlayer2(
-            player2 => ({
-                ...player2,
-                selection: Object.values(picks)[index]
-            })
-        )
-        calculateWinner()
-        setPlayer1Turn(true)
-    }
+    useEffect(() => {
+        if(player1.selection.name) {
+            const index = Math.floor(Math.random() * 5)
+            const pick = Object.values(picks)[index]
+            setPlayer2(
+                player2 => ({
+                    ...player2,
+                    selection: player1.selection.name ? pick : {}
+                })
+            )
+            calculateWinner()
+        }
+    }, [player1.selection])
 
     function calculateWinner() {
         if(player1.selection.name === player2.selection.name) {
             console.log('EMPATARON!')
+            console.log(player1.selection.name)
+            console.log(player2.selection.name)
         } else if(playerWins(player1.selection)) {
              setPlayer1(
                 player1 => ({
@@ -80,10 +71,11 @@ const VersusIA = () => {
                 })
              )
         }
+        setPlayer1Turn(true)
     }
 
     function playerWins() {
-        let result = player1.selection.winsAgainst.map(winable => winable === player2.selection.name)
+        let result = player1.selection?.winsAgainst.map(winable => winable === player2.selection.name)
         return result.includes(true)
     }
 
@@ -91,10 +83,10 @@ const VersusIA = () => {
         <Fragment>
             <div className="row d-flex justify-content-center">
                 <div className="col">
-                    <ScoreBar playerName={player1.name} score={player1.points}/>
+                    <ScoreBar playerName={player1.name} score={player1.points} rounds={rounds}/>
                 </div>
                 <div className="col">
-                    <ScoreBar playerName={player2.name} score={player2.points}/>
+                    <ScoreBar playerName={player2.name} score={player2.points} rounds={rounds}/>
                 </div>
             </div>
             <div className="row mt-5 border">
@@ -104,10 +96,21 @@ const VersusIA = () => {
                 <div className="vr p-0"/>
                 <div className="col"><SelectionDrawInterface player={player2}/></div>
                 <div className="vr p-0"/>
-                <div className="col-2 text-center my-auto"><Selector changeTurnHandler={player2Pick} picks={picks} playerTurn={!player1Turn}/></div>
+                <div className="col-2 text-center my-auto"><Selector changeTurnHandler={player1Pick} picks={picks} playerTurn={!player1Turn}/></div>
             </div>
         </Fragment>
     )
 }
 
 export default VersusIA
+
+
+//function player2Pick(playerSelection) {
+//    setPlayer2(
+//        player2 => ({
+//            ...player2,
+//            selection: playerSelection
+//        })
+//    )
+//    calculateWinner()
+//}
