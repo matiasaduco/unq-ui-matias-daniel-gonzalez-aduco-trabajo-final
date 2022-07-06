@@ -29,7 +29,7 @@ function App() {
 
   function navigateToPlayZone() {
     if(IAButton === 'active' && player1Name && roundsQuantity !== 0) {
-      const IAName = Object.values(['Sheldon', 'Leonard', 'Howie', 'Raj'])[Math.floor(Math.random() * 5)]
+      const IAName = Object.values(['Sheldon', 'Leonard', 'Howie', 'Raj'])[Math.floor(Math.random() * 4)]
       navigate('/versus_ia', {state: {player1: player1Name, player2: '[I.A.] ' + IAName, mode: 'IA', rounds: roundsQuantity}})
     }
     else if (playerButton === 'active' && player1Name && player2Name && roundsQuantity !== 0) {

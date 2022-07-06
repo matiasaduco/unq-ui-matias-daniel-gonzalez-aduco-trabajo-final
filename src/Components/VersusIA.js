@@ -1,23 +1,27 @@
 import { Fragment, useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import ScoreBar from './ScoreBar';
 import Selector from './Selector';
 import SelectionDrawInterface from './SelectionDrawInterface';
-
 import piedraImg from '../Images/Pool/Piedra.png'
 import papelImg from '../Images/Pool/Papel.png'
 import tijeraImg from '../Images/Pool/Tijera.png'
 import lagartoImg from '../Images/Pool/Lagarto.png'
 import spockImg from '../Images/Pool/Spock.png'
-import { useStateWithCallbackLazy } from 'use-state-with-callback';
-
 
 const VersusIA = () => {
     const location = useLocation()
-    const [player1, setPlayer1] = useStateWithCallbackLazy({name: location.state.player1, points: 0, selection: {}})
-    const [player2, setPlayer2] = useStateWithCallbackLazy({name: location.state.player2, points: 0, selection: {}})
+    const navigate = useNavigate()
+
+    const [player1, setPlayer1] = useState({name: location.state.player1, points: 0, selection: {}})
+    const [player2, setPlayer2] = useState({name: location.state.player2, points: 0, selection: {}})
+
     const [player1Turn, setPlayer1Turn] = useState(true)
+    const [winner, setWinner] = useState({})
+    const [winnerMessage, setWinnerMessage] = useState('')
     const rounds = location.state.rounds
+
+    const [ready, setReady] = useState(false)
 
     const picks = {
                     piedra: {name: 'Piedra', img: piedraImg, winsAgainst: ['Tijera', 'Lagarto']},
@@ -28,82 +32,118 @@ const VersusIA = () => {
                   }
 
     function player1Pick(playerSelection) {
-        setPlayer1(
-            player1 => ({
-                ...player1,
-                selection: playerSelection
+        if(!isOver()) {
+            setPlayer1(
+                player1 => ({
+                    ...player1,
+                    selection: playerSelection
+                })
+            )
+            machineTurn()
+            setPlayer1Turn(false)
+        }
+    }
+
+    function isOver() {
+        return player1.points === rounds || player2.points === rounds
+    }
+
+    function machineTurn() {
+        const index = Math.floor(Math.random() * 5)
+        const pick = Object.values(picks)[index]
+        setPlayer2(
+            player2 => ({
+                ...player2,
+                selection: pick
             })
         )
-        setPlayer1Turn(false)
+        setReady(true)
     }
 
     useEffect(() => {
-        if(player1.selection.name) {
-            const index = Math.floor(Math.random() * 5)
-            const pick = Object.values(picks)[index]
-            setPlayer2(
-                player2 => ({
-                    ...player2,
-                    selection: player1.selection.name ? pick : {}
-                })
-            )
-            calculateWinner()
+        if(ready) {
+            if(player1.selection.name === player2.selection.name) {
+                console.log('EMPATARON!')
+            } else if(playerWins(player1.selection)) {
+                 setPlayer1(
+                    player1 => ({
+                        ...player1,
+                        points: player1.points + 1
+                    })
+                 )
+                 setWinner(player1)
+            } else {
+                setPlayer2(
+                    player2 => ({
+                        ...player2,
+                        points: player2.points + 1
+                    })
+                 )
+                 setWinner(player2)
+            }
+            setReady(false)
+            setPlayer1Turn(true)
         }
-    }, [player1.selection])
-
-    function calculateWinner() {
-        if(player1.selection.name === player2.selection.name) {
-            console.log('EMPATARON!')
-            console.log(player1.selection.name)
-            console.log(player2.selection.name)
-        } else if(playerWins(player1.selection)) {
-             setPlayer1(
-                player1 => ({
-                    ...player1,
-                    points: player1.points + 1
-                })
-             )
-        } else {
-            setPlayer2(
-                player2 => ({
-                    ...player2,
-                    points: player2.points + 1
-                })
-             )
-        }
-        setPlayer1Turn(true)
-    }
+    }, [ready])
 
     function playerWins() {
         let result = player1.selection?.winsAgainst.map(winable => winable === player2.selection.name)
         return result.includes(true)
     }
 
+    function resetStats() {
+        setPlayer1(
+            player1 => ({
+                ...player1,
+                points: 0,
+                selection: {}
+            })
+        )
+        setPlayer2(
+            player2 => ({
+                ...player2,
+                points: 0,
+                selection: {}
+            })
+        )
+        setWinner({})
+        setPlayer1Turn(true)
+    }
+
+    useEffect(() => {
+        console.log(winner.points)
+        setWinnerMessage(winner.points === rounds? `${winner.name} ganó la partida!!` : `Punto para ${winner.name}`)
+    }, [winner])
+
     return(
         <Fragment>
             <div className="row d-flex justify-content-center">
                 <div className="col">
-                    <ScoreBar playerName={player1.name} score={player1.points} rounds={rounds}/>
+                    <ScoreBar player={player1} rounds={rounds}/>
                 </div>
                 <div className="col">
-                    <ScoreBar playerName={player2.name} score={player2.points} rounds={rounds}/>
+                    <ScoreBar player={player2} rounds={rounds}/>
                 </div>
             </div>
-            <div className="row mt-5 border">
+            <h3 className='text-center mt-4'>{winnerMessage}</h3>
+            <div className="row mt-4 border">
                 <div className="col-2 text-center my-auto"><Selector changeTurnHandler={player1Pick} picks={picks} playerTurn={player1Turn}/></div>
                 <div className="vr p-0"/>
-                <div className="col"><SelectionDrawInterface player={player1}/></div>
+                <div className="col"><SelectionDrawInterface player={player1} winner={winner}/></div>
                 <div className="vr p-0"/>
-                <div className="col"><SelectionDrawInterface player={player2}/></div>
+                <div className="col"><SelectionDrawInterface player={player2} winner={winner}/></div>
                 <div className="vr p-0"/>
                 <div className="col-2 text-center my-auto"><Selector changeTurnHandler={player1Pick} picks={picks} playerTurn={!player1Turn}/></div>
             </div>
+            <div className="text-center mt-4" role="group">
+                <button type="button" className="btn btn-primary me-1" onClick={resetStats}>Jugar de nuevo</button>
+                <button type="button" className="btn btn-primary ms-1" onClick={() => navigate('/')}>Menú principal</button>
+            </div>
         </Fragment>
-    )
+    );
 }
 
 export default VersusIA
-
 
 //function player2Pick(playerSelection) {
 //    setPlayer2(
