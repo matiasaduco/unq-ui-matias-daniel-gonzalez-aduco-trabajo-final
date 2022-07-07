@@ -12,14 +12,14 @@ import spockImg from '../Images/Pool/Spock.png'
 const VersusIA = () => {
     const location = useLocation()
     const navigate = useNavigate()
+    const rounds = location.state.rounds
 
     const [player1, setPlayer1] = useState({name: location.state.player1, points: 0, selection: {}})
     const [player2, setPlayer2] = useState({name: location.state.player2, points: 0, selection: {}})
 
     const [player1Turn, setPlayer1Turn] = useState(true)
-    const [winner, setWinner] = useState({})
+    const [winner, setWinner] = useState()
     const [winnerMessage, setWinnerMessage] = useState('')
-    const rounds = location.state.rounds
 
     const [ready, setReady] = useState(false)
 
@@ -64,7 +64,7 @@ const VersusIA = () => {
         if(ready) {
             if(player1.selection.name === player2.selection.name) {
                 console.log('EMPATARON!')
-            } else if(playerWins(player1.selection)) {
+            } else if(playerWins()) {
                  setPlayer1(
                     player1 => ({
                         ...player1,
@@ -91,6 +91,10 @@ const VersusIA = () => {
         return result.includes(true)
     }
 
+    useEffect(() => {
+        winner && setWinnerMessage(winner.points === rounds ? `${winner.name} ganó la partida!!` : `Punto para ${winner.name}`)
+    }, [winner])
+
     function resetStats() {
         setPlayer1(
             player1 => ({
@@ -106,14 +110,8 @@ const VersusIA = () => {
                 selection: {}
             })
         )
-        setWinner({})
         setPlayer1Turn(true)
     }
-
-    useEffect(() => {
-        console.log(winner.points)
-        setWinnerMessage(winner.points === rounds? `${winner.name} ganó la partida!!` : `Punto para ${winner.name}`)
-    }, [winner])
 
     return(
         <Fragment>
@@ -129,9 +127,9 @@ const VersusIA = () => {
             <div className="row mt-4 border">
                 <div className="col-2 text-center my-auto"><Selector changeTurnHandler={player1Pick} picks={picks} playerTurn={player1Turn}/></div>
                 <div className="vr p-0"/>
-                <div className="col"><SelectionDrawInterface player={player1} winner={winner}/></div>
+                <div className="col"><SelectionDrawInterface player={player1}/></div>
                 <div className="vr p-0"/>
-                <div className="col"><SelectionDrawInterface player={player2} winner={winner}/></div>
+                <div className="col"><SelectionDrawInterface player={player2}/></div>
                 <div className="vr p-0"/>
                 <div className="col-2 text-center my-auto"><Selector changeTurnHandler={player1Pick} picks={picks} playerTurn={!player1Turn}/></div>
             </div>
