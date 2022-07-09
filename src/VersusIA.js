@@ -1,13 +1,13 @@
 import { Fragment, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import ScoreBar from './ScoreBar';
-import Selector from './Selector';
-import SelectionDrawInterface from './SelectionDrawInterface';
-import piedraImg from '../Images/Pool/Piedra.png'
-import papelImg from '../Images/Pool/Papel.png'
-import tijeraImg from '../Images/Pool/Tijera.png'
-import lagartoImg from '../Images/Pool/Lagarto.png'
-import spockImg from '../Images/Pool/Spock.png'
+import ScoreBar from './Components/ScoreBar';
+import Selector from './Components/Selector';
+import SelectionDrawInterface from './Components/SelectionDrawInterface';
+import piedraImg from './Images/Pool/Piedra.png'
+import papelImg from './Images/Pool/Papel.png'
+import tijeraImg from './Images/Pool/Tijera.png'
+import lagartoImg from './Images/Pool/Lagarto.png'
+import spockImg from './Images/Pool/Spock.png'
 
 const VersusIA = () => {
     const location = useLocation()
@@ -19,7 +19,6 @@ const VersusIA = () => {
 
     const [player1Turn, setPlayer1Turn] = useState(true)
     const [winner, setWinner] = useState()
-    const [winnerMessage, setWinnerMessage] = useState('')
 
     const [ready, setReady] = useState(false)
 
@@ -91,10 +90,6 @@ const VersusIA = () => {
         return result.includes(true)
     }
 
-    useEffect(() => {
-        winner && setWinnerMessage(winner.points === rounds ? `${winner.name} ganó la partida!!` : `Punto para ${winner.name}`)
-    }, [winner])
-
     function resetStats() {
         setPlayer1(
             player1 => ({
@@ -109,7 +104,8 @@ const VersusIA = () => {
                 points: 0,
                 selection: {}
             })
-        )
+        )        
+        setWinner({})
         setPlayer1Turn(true)
     }
 
@@ -123,19 +119,18 @@ const VersusIA = () => {
                     <ScoreBar player={player2} rounds={rounds}/>
                 </div>
             </div>
-            <h3 className='text-center mt-4'>{winnerMessage}</h3>
-            <div className="row mt-4 border">
+            <div className="row mt-4 border bg-light w-100 mx-auto">
                 <div className="col-2 text-center my-auto"><Selector changeTurnHandler={player1Pick} picks={picks} playerTurn={player1Turn}/></div>
                 <div className="vr p-0"/>
-                <div className="col"><SelectionDrawInterface player={player1}/></div>
+                <div className="col"><SelectionDrawInterface player={player1} winner={winner}/></div>
                 <div className="vr p-0"/>
-                <div className="col"><SelectionDrawInterface player={player2}/></div>
+                <div className="col"><SelectionDrawInterface player={player2} winner={winner}/></div>
                 <div className="vr p-0"/>
                 <div className="col-2 text-center my-auto"><Selector changeTurnHandler={player1Pick} picks={picks} playerTurn={!player1Turn}/></div>
             </div>
             <div className="text-center mt-4" role="group">
-                <button type="button" className="btn btn-primary me-1" onClick={resetStats}>Jugar de nuevo</button>
-                <button type="button" className="btn btn-primary ms-1" onClick={() => navigate('/')}>Menú principal</button>
+                <button type="button" className="btn btn-warning me-1" onClick={resetStats}>Jugar de nuevo</button>
+                <button type="button" className="btn btn-warning ms-1" onClick={() => navigate('/')}>Menú principal</button>
             </div>
         </Fragment>
     );

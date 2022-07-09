@@ -1,7 +1,6 @@
-import { Fragment, useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './App.css';
-import player from './Images/player.png'
+import player from './Images/player.png';
 
 function App() {
   const [IAButton, setIAButton] = useState('active')
@@ -28,7 +27,7 @@ function App() {
   }
 
   function navigateToPlayZone() {
-    if(IAButton === 'active' && player1Name && roundsQuantity !== 0) {
+    if(IAButton === 'active' && player1Name && roundsQuantity) {
       const IAName = Object.values(['Sheldon', 'Leonard', 'Howie', 'Raj'])[Math.floor(Math.random() * 4)]
       navigate('/versus_ia', {state: {player1: player1Name, player2: '[I.A.] ' + IAName, mode: 'IA', rounds: roundsQuantity}})
     }
@@ -38,15 +37,15 @@ function App() {
   }
 
   return (
-    <div className='container text-center'>
-      <div className='row mt-5 mb-1 w-75 mx-auto'>
+    <div className='container text-center w-50 border border-2 bg-light pt-5 pb-5'>
+      <div className='row mb-1 w-75 mx-auto'>
         <div className='col'>
           <h3>Seleccione un modo de juego!</h3>
         </div>
       </div>
       <div className="btn-group w-25 mx-auto mb-3">
-        <button className={`btn btn-outline-primary ${IAButton} w-25`} onClick={changeToVsIA}>Vs. IA</button>
-        <button className={`btn btn-outline-primary ${playerButton} w-25`} onClick={changeVsPlayer}>Vs. Player</button>
+        <button className={`btn btn-outline-warning ${IAButton} w-25`} onClick={changeToVsIA}>Vs. IA</button>
+        <button className={`btn btn-outline-warning ${playerButton} w-25`} onClick={changeVsPlayer}>Vs. Player</button>
       </div>
       <div className='mb-3'>
         <div class="form-check form-check-inline">
@@ -75,7 +74,7 @@ function App() {
         <input type='text' className='col-2 border border-2 rounded-end w-25 me-auto' onChange={(event) => setPlayer2Name(event.target.value)} placeholder='Player 2'/>
       </div>
       <div className='text-center'>
-        <button className='btn btn-outline-primary' onClick={navigateToPlayZone}>Jugar</button>
+        <button className='btn btn-warning' onClick={navigateToPlayZone}>Jugar</button>
       </div>
     </div>
   );
