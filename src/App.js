@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Tutorial from './Components/Tutorial';
 import player from './Images/player.png';
 
 function App() {
@@ -37,7 +38,8 @@ function App() {
   }
 
   return (
-    <div className='container text-center w-50 border border-2 bg-light pt-5 pb-5'>
+    <div className='container text-center w-50 border border-2 bg-light pb-5'>
+      <Tutorial />
       <div className='row mb-1 w-75 mx-auto'>
         <div className='col'>
           <h3>Seleccione un modo de juego!</h3>
@@ -48,17 +50,17 @@ function App() {
         <button className={`btn btn-outline-warning ${playerButton} w-25`} onClick={changeVsPlayer}>Vs. Player</button>
       </div>
       <div className='mb-3'>
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" onChange={() => setRoundsQuantity(1)}/>
-          <label class="form-check-label" for="inlineRadio1">1 ronda</label>
+        <div className="form-check form-check-inline">
+          <input className="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" onChange={() => setRoundsQuantity(1)}/>
+          <label className="form-check-label" htmlFor="inlineRadio1">1 ronda</label>
         </div>
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" onChange={() => setRoundsQuantity(3)}/>
-          <label class="form-check-label" for="inlineRadio2">3 rondas</label>
+        <div className="form-check form-check-inline">
+          <input className="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" onChange={() => setRoundsQuantity(3)}/>
+          <label className="form-check-label" htmlFor="inlineRadio2">3 rondas</label>
         </div>
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3" onChange={() => setRoundsQuantity(5)}/>
-          <label class="form-check-label" for="inlineRadio3">5 rondas</label>
+        <div className="form-check form-check-inline">
+          <input className="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3" onChange={() => setRoundsQuantity(5)}/>
+          <label className="form-check-label" htmlFor="inlineRadio3">5 rondas</label>
         </div>
       </div>
       <div className='row mt-1 mb-3 w-75 mx-auto'>
