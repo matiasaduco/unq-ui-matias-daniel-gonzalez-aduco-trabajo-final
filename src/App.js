@@ -30,10 +30,10 @@ function App() {
   function navigateToPlayZone() {
     if(IAButton === 'active' && player1Name && roundsQuantity) {
       const IAName = Object.values(['Sheldon', 'Leonard', 'Howie', 'Raj'])[Math.floor(Math.random() * 4)]
-      navigate('/versus_ia', {state: {player1: player1Name, player2: '[I.A.] ' + IAName, mode: 'IA', rounds: roundsQuantity}})
+      navigate('/match', {state: {player1: player1Name, player2: '[I.A.] ' + IAName, mode: 'IA', rounds: roundsQuantity}})
     }
-    else if (playerButton === 'active' && player1Name && player2Name && roundsQuantity !== 0) {
-      navigate('/versus_ia', {state: {player1: player1Name, player2: player2Name, mode: 'PVP', rounds: roundsQuantity}})
+    else if (playerButton === 'active' && player1Name && player2Name && roundsQuantity) {
+      navigate('/match', {state: {player1: player1Name, player2: player2Name, mode: 'PVP', rounds: roundsQuantity}})
     }
   }
 
@@ -67,13 +67,13 @@ function App() {
         <span className='col-1 input-group-text rounded-0 ms-auto'>
           <img src={player} alt='acá hay una fotito porno' className='text-center mx-auto' height='24' width='20'/>
         </span>
-        <input type='text' className='col-2 border border-2 rounded-end w-25 me-auto' onChange={(event) => setPlayer1Name(event.target.value)} placeholder='Player 1'/>
+        <input type='text' className='col-2 border border-2 rounded-end w-25 me-auto' value={player1Name} onChange={(event) => setPlayer1Name(event.target.value)} placeholder='Player 1'/>
       </div>
       <div className={`row mb-3 w-75 mx-auto ${twoPlayerMode}`}>
         <span className={`col-1 input-group-text rounded-0 ms-auto`}>
           <img src={player} className='text-center mx-auto' height='24' width='20' />
         </span>
-        <input type='text' className='col-2 border border-2 rounded-end w-25 me-auto' onChange={(event) => setPlayer2Name(event.target.value)} placeholder='Player 2'/>
+        <input type='text' className='col-2 border border-2 rounded-end w-25 me-auto' value={player2Name} onChange={(event) => setPlayer2Name(event.target.value)} placeholder='Player 2'/>
       </div>
       <div className='text-center'>
         <button className='btn btn-warning' onClick={navigateToPlayZone}>Jugar</button>

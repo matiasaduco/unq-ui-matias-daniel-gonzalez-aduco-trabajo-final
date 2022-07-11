@@ -9,7 +9,7 @@ import tijeraImg from './Images/Pool/Tijera.png'
 import lagartoImg from './Images/Pool/Lagarto.png'
 import spockImg from './Images/Pool/Spock.png'
 
-const VersusIA = () => {
+const Match = () => {
     const location = useLocation()
     const navigate = useNavigate()
     const rounds = location.state.rounds
@@ -18,7 +18,7 @@ const VersusIA = () => {
     const [player2, setPlayer2] = useState({name: location.state.player2, points: 0, selection: {}})
 
     const [player1Turn, setPlayer1Turn] = useState(true)
-    const [winner, setWinner] = useState()
+    const [winner, setWinner] = useState('')
 
     const [ready, setReady] = useState(false)
 
@@ -30,7 +30,7 @@ const VersusIA = () => {
                     spock: {name: 'Spock', img: spockImg, winsAgainst: ['Tijera', 'Piedra']}
                   }
 
-    function player1Pick(playerSelection) {
+    const player1Pick = (playerSelection) => {
         if(!isOver()) {
             setPlayer1(
                 player1 => ({
@@ -38,16 +38,18 @@ const VersusIA = () => {
                     selection: playerSelection
                 })
             )
-            machineTurn()
+            if(location.state.mode === 'IA'){
+                machineTurn()
+            }
             setPlayer1Turn(false)
         }
     }
 
-    function isOver() {
+    const isOver = () => {
         return player1.points === rounds || player2.points === rounds
     }
 
-    function machineTurn() {
+    const machineTurn = () => {
         const index = Math.floor(Math.random() * 5)
         const pick = Object.values(picks)[index]
         setPlayer2(
@@ -59,38 +61,48 @@ const VersusIA = () => {
         setReady(true)
     }
 
+    const player2Pick = (playerSelection) => {
+        setPlayer2(
+            player2 => ({
+                ...player2,
+                selection: playerSelection
+            })
+        )
+        setReady(true)
+    }
+
     useEffect(() => {
         if(ready) {
             if(player1.selection.name === player2.selection.name) {
-                console.log('EMPATARON!')
+                setWinner('Empate')
             } else if(playerWins()) {
-                 setPlayer1(
+                    setPlayer1(
                     player1 => ({
                         ...player1,
                         points: player1.points + 1
                     })
-                 )
-                 setWinner(player1)
+                    )
+                    setWinner(player1.name)
             } else {
                 setPlayer2(
                     player2 => ({
                         ...player2,
                         points: player2.points + 1
                     })
-                 )
-                 setWinner(player2)
+                    )
+                    setWinner(player2.name)
             }
             setReady(false)
             setPlayer1Turn(true)
         }
     }, [ready])
 
-    function playerWins() {
+    const playerWins = () => {
         let result = player1.selection?.winsAgainst.map(winable => winable === player2.selection.name)
         return result.includes(true)
     }
 
-    function resetStats() {
+    const resetStats = () => {
         setPlayer1(
             player1 => ({
                 ...player1,
@@ -105,7 +117,7 @@ const VersusIA = () => {
                 selection: {}
             })
         )        
-        setWinner({})
+        setWinner('')
         setPlayer1Turn(true)
     }
 
@@ -126,7 +138,7 @@ const VersusIA = () => {
                 <div className="vr p-0"/>
                 <div className="col"><SelectionDrawInterface player={player2} winner={winner}/></div>
                 <div className="vr p-0"/>
-                <div className="col-2 text-center my-auto"><Selector changeTurnHandler={player1Pick} picks={picks} playerTurn={!player1Turn}/></div>
+                <div className="col-2 text-center my-auto"><Selector changeTurnHandler={player2Pick} picks={picks} playerTurn={!player1Turn}/></div>
             </div>
             <div className="text-center mt-4" role="group">
                 <button type="button" className="btn btn-warning me-1" onClick={resetStats}>Jugar de nuevo</button>
@@ -136,14 +148,4 @@ const VersusIA = () => {
     );
 }
 
-export default VersusIA
-
-//function player2Pick(playerSelection) {
-//    setPlayer2(
-//        player2 => ({
-//            ...player2,
-//            selection: playerSelection
-//        })
-//    )
-//    calculateWinner()
-//}
+export default Match
