@@ -1,10 +1,15 @@
 import { Fragment, useState } from "react";
+import tutorialImg1 from '../Images/Tutorial/tutorial 1.png'
+import tutorialImg2 from '../Images/Tutorial/tutorial 2.png'
+import tutorialImg3 from '../Images/Tutorial/tutorial 3.png'
+import tutorialImg4 from '../Images/Tutorial/tutorial 4.png'
+import tutorialImg5 from '../Images/Tutorial/tutorial 5.png'
 
 const Tutorial = () => {
     const [activeTab, setActiveTab] = useState(0)
-    const lista = ['tut1', 'tut2', 'tut3', 'tut4']
+    const listOfTutorial = [tutorialImg1, tutorialImg2, tutorialImg3, tutorialImg4, tutorialImg5]
 
-    function resetTab() {
+    const resetTab = () => {
         setActiveTab(0)
     }
 
@@ -21,14 +26,14 @@ const Tutorial = () => {
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div className="modal-body">
-                            {lista.map((imagen, index) => <img key={index} src={imagen} alt={`tutorial ${index}`} className={`${index === activeTab ? 'd-block' : 'd-none'}`}/>)}
+                            {listOfTutorial.map((image, index) => <img key={index} src={`${image}`} alt={`tutorial ${index}`} className={`w-100 ${index === activeTab ? 'd-block' : 'd-none'}`}/>)}
                         </div>
                         <nav>
                             <ul className="pagination">
                                 <li className={`page-item ${activeTab === 0 ? 'disabled' : ''}`}>
                                     <button className="page-link" onClick={() => setActiveTab(activeTab - 1)}>Anterior</button>
                                 </li>
-                                <li className={`page-item ${activeTab === lista.length - 1 ? 'disabled' : ''}`}>
+                                <li className={`page-item ${activeTab === listOfTutorial.length - 1 ? 'disabled' : ''}`}>
                                     <button className="page-link" onClick={() => setActiveTab(activeTab + 1)}>Siguiente</button>
                                 </li>
                             </ul>
