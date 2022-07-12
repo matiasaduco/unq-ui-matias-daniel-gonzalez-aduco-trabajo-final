@@ -8,6 +8,7 @@ import papelImg from './Images/Pool/Papel.png'
 import tijeraImg from './Images/Pool/Tijera.png'
 import lagartoImg from './Images/Pool/Lagarto.png'
 import spockImg from './Images/Pool/Spock.png'
+import Rules from './Components/Rules';
 
 const Match = () => {
     const location = useLocation()
@@ -73,29 +74,33 @@ const Match = () => {
 
     useEffect(() => {
         if(ready) {
-            if(player1.selection.name === player2.selection.name) {
-                setWinner('Empate')
-            } else if(playerWins()) {
-                    setPlayer1(
-                    player1 => ({
-                        ...player1,
-                        points: player1.points + 1
-                    })
-                    )
-                    setWinner(player1.name)
-            } else {
-                setPlayer2(
-                    player2 => ({
-                        ...player2,
-                        points: player2.points + 1
-                    })
-                    )
-                    setWinner(player2.name)
-            }
+            calculateWinner()
             setReady(false)
             setPlayer1Turn(true)
         }
     }, [ready])
+
+    const calculateWinner = () => {
+        if(player1.selection.name === player2.selection.name) {
+            setWinner('Empate')
+        } else if(playerWins()) {
+                setPlayer1(
+                player1 => ({
+                    ...player1,
+                    points: player1.points + 1
+                })
+                )
+                setWinner(player1.name)
+        } else {
+            setPlayer2(
+                player2 => ({
+                    ...player2,
+                    points: player2.points + 1
+                })
+                )
+                setWinner(player2.name)
+        }
+    }
 
     const playerWins = () => {
         let result = player1.selection?.winsAgainst.map(winable => winable === player2.selection.name)
@@ -126,6 +131,9 @@ const Match = () => {
             <div className="row d-flex justify-content-center">
                 <div className="col">
                     <ScoreBar player={player1} rounds={rounds}/>
+                </div>
+                <div className='col w-25 p-1 text-center'>
+                    <Rules/>
                 </div>
                 <div className="col">
                     <ScoreBar player={player2} rounds={rounds}/>
