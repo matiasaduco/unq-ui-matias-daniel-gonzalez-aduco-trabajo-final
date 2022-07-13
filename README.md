@@ -17,7 +17,7 @@ Instalará todas las dependencias necesarias para que el proyecto pueda ejecutar
 Inicia la aplicación en modo desarollador.\
 Para ver la aplicación abra su navegador preferido y vaya a: [http://localhost:3000](http://localhost:3000).
 
-### El Juego
+## El Juego
 
 El juego es como un piedra papel o tijera tradicional, pero con la diferencia de que se agrega `Lagarto` y `Spock`.
 Las reglas quedarían de la siguiente manera:
